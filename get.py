@@ -57,6 +57,20 @@ def get_name_cinema(html):          #возващаем словарь к-р:url
     dict_cinemas = list_cinemas      
     return(dict_cinemas)
 
+
+def create_buttons_cinemas(dict_cinemas):
+    names = []
+    a_lists = []
+    for name in dict_cinemas:
+        names.append(name)   
+    while len(names) > 3:
+        three_cinema = names[:3]
+        a_lists.append(three_cinema)        
+        names = names[3:]
+    a_lists.append(names)           
+    return(a_lists)
+
+
 # # html = "https://www.kinopoisk.ru/cinemas/tc/463/"
 # dict_cinemas = {} 
 # url_cinema = ""
@@ -77,35 +91,25 @@ def get_name_cinema(html):          #возващаем словарь к-р:url
 # #     url_cinema = (f"https://www.kinopoisk.ru{value}")
 # #     print(url_cinema)
 
-def create_buttons_cinemas(dict_cinemas):
-    names = []
-    a_lists = []
-    for name in dict_cinemas:
-        names.append(name)   
-    while len(names) > 3:
-        three_cinema = names[:3]
-        a_lists.append(three_cinema)        
-        names = names[3:]
-    a_lists.append(names)           
-    return(a_lists)
 
 
 
-def but_cin(list_buttons):  
-    dict_cinemas = list_buttons         
-    buttons = ([])
-    a_lists =([])
-    for para in list_buttons:        
-        buttons.append(para)
-    print(buttons[1])
-    # get_afisha(buttons[1],dict_cinemas)    
-    while len(buttons) > 3:
-        a_list = buttons[:3]
-        a_lists.append(a_list)        
-        buttons = buttons[3:]        
-    a_lists.append(buttons) 
-    list_buttons =add_default_buttons(a_lists)        
-    return(list_buttons)
+
+# def but_cin(list_buttons):  
+#     dict_cinemas = list_buttons         
+#     buttons = ([])
+#     a_lists =([])
+#     for para in list_buttons:        
+#         buttons.append(para)
+#     print(buttons[1])
+#     # get_afisha(buttons[1],dict_cinemas)    
+#     while len(buttons) > 3:
+#         a_list = buttons[:3]
+#         a_lists.append(a_list)        
+#         buttons = buttons[3:]        
+#     a_lists.append(buttons) 
+#     list_buttons =add_default_buttons(a_lists)        
+#     return(list_buttons)
 
 # def add_default_buttons(lsits):
 #     lsits.append(["РїСЂРёСЃР»Р°С‚СЊ Р»РёСЃР°", "СЃРјРµРЅРёС‚СЊ Р°РІР°С‚Р°СЂ"]
