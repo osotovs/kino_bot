@@ -1,0 +1,7 @@
+*.log
+.vscode
+settings.py
+__pycache__
+env
+*.cmd
+*.txt
