@@ -2,8 +2,24 @@ from random import choice
 
 from emoji import emojize
 from telegram import ReplyKeyboardMarkup, KeyboardButton
+from bs4 import BeautifulSoup
+import requests
+import datetime
 
 import settings
+
+td = datetime.datetime.now()
+date = td.strftime("%Y-%m-%d")
+
+city_list = {
+    "Томск": "https://www.kinopoisk.ru/cinemas/tc/463/",
+    "Москва": "https://www.kinopoisk.ru/cinemas/tc/1/",
+    "Петербург": "https://www.kinopoisk.ru/cinemas/tc/2/"
+}
+
+def get_url_cinema(name_):              #находим url кинотеатра
+    if name_ in city_list.keys():
+        return city_list.get(name_)
 
 
 def get_user_emo(user_data):
@@ -21,16 +37,30 @@ def get_keyboard():
     return(my_keyboard)
 
 
-# import requests
-# from bs4 import BeautifulSoup
+def get_html(url):
+    try:
+        result = requests.get(url)
+        result.raise_for_status()        
+        return result.text        
+    except(requests.RequestsException, ValueError):
+        return False
 
-# import datetime
+
+def get_name_cinema(html):          #возващаем словарь к-р:url
+    soup = BeautifulSoup(html, "html.parser")
+    name_cinema =  soup.findAll("a", itemprop="name")       
+    list_cinemas = {}
+    for name in name_cinema: 
+        url_cinema = str(name).split("\"")
+        nam = (f"К-р {name.text}")
+        list_cinemas.update({nam:url_cinema[3]})           
+    dict_cinemas = list_cinemas      
+    return(dict_cinemas)
 
 # # html = "https://www.kinopoisk.ru/cinemas/tc/463/"
 # dict_cinemas = {} 
 # url_cinema = ""
-# td = datetime.datetime.now()
-# date = td.strftime("%Y-%m-%d")
+
 # # my_keyboard = get_html("https://www.kinopoisk.ru/cinemas/tc/463/")
 
 # # contact_button = KeyboardButton("РїСЂРёСЃР»Р°С‚СЊ РєРѕРЅС‚Р°РєС‚С‹", request_contact = True)
@@ -47,44 +77,35 @@ def get_keyboard():
 # #     url_cinema = (f"https://www.kinopoisk.ru{value}")
 # #     print(url_cinema)
 
-# def get_html(url):
-#     try:
-#         result = requests.get(url)
-#         result.raise_for_status()
-#         # print(result.text)
-#         return result.text        
-#     except(requests.RequestsException, ValueError):
-#         return False
+def create_buttons_cinemas(dict_cinemas):
+    names = []
+    a_lists = []
+    for name in dict_cinemas:
+        names.append(name)   
+    while len(names) > 3:
+        three_cinema = names[:3]
+        a_lists.append(three_cinema)        
+        names = names[3:]
+    a_lists.append(names)           
+    return(a_lists)
 
-# def get_name_cinema(html):
-#     soup = BeautifulSoup(html, "html.parser")
-#     name_cinema =  soup.findAll("a", itemprop="name")   
-#     print(name_cinema) 
-#     list_cinemas = {}
-#     for name in name_cinema: 
-#         url_cinema = str(name).split("\"")
-#         nam = (f"Рє-СЂ {name.text}")
-#         list_cinemas.update({nam:url_cinema[3]})  
-#     global dict_cinemas        
-#     dict_cinemas = list_cinemas    
-#     print(dict_cinemas)
-#     return(but_cin(dict_cinemas))  
 
-# def but_cin(list_buttons):  
-#     dict_cinemas = list_buttons         
-#     buttons = ([])
-#     a_lists =([])
-#     for para in list_buttons:        
-#         buttons.append(para)
-#     print(buttons[1])
-#     # get_afisha(buttons[1],dict_cinemas)    
-#     while len(buttons) > 3:
-#         a_list = buttons[:3]
-#         a_lists.append(a_list)        
-#         buttons = buttons[3:]        
-#     a_lists.append(buttons) 
-#     list_buttons =add_default_buttons(a_lists)        
-#     return(list_buttons)
+
+def but_cin(list_buttons):  
+    dict_cinemas = list_buttons         
+    buttons = ([])
+    a_lists =([])
+    for para in list_buttons:        
+        buttons.append(para)
+    print(buttons[1])
+    # get_afisha(buttons[1],dict_cinemas)    
+    while len(buttons) > 3:
+        a_list = buttons[:3]
+        a_lists.append(a_list)        
+        buttons = buttons[3:]        
+    a_lists.append(buttons) 
+    list_buttons =add_default_buttons(a_lists)        
+    return(list_buttons)
 
 # def add_default_buttons(lsits):
 #     lsits.append(["РїСЂРёСЃР»Р°С‚СЊ Р»РёСЃР°", "СЃРјРµРЅРёС‚СЊ Р°РІР°С‚Р°СЂ"]

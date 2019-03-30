@@ -2,8 +2,7 @@ import logging
 from random import choice
 from telegram import replykeyboardremove, ReplyKeyboardMarkup
 
-from get import get_keyboard, get_user_emo
-
+from get import *
 
 def greet_user(bot, update,user_data):
     emo = get_user_emo(user_data)
@@ -35,14 +34,23 @@ def change_ava(bot, update, user_data):
 
 
 def k_select_city(bot, update, user_data):
-    reply_keyboard = [["Томск","Москва","Питербург"]]
+    reply_keyboard = [["Томск","Москва","Петербург"],
+        ["определить по месту нахождения"]]
     update.message.reply_text(
         "Отлично! Выбираем",
         reply_markup = ReplyKeyboardMarkup(reply_keyboard, 
-        one_time_keyboard = True, resize_keyboard=True))
+        one_time_keyboard = False, resize_keyboard=True))
     return("select_cinema")
 
 def k_select_cinema(bot, update, user_data):
     user_city = update.message.text
-    user_data["user_city"] = user_city
-    update.message.reply_text("Выбираем кинотеатр")
+    user_data["user_city"] = user_city    
+    html = get_url_cinema(user_city)
+    url = get_html(html)
+    dict_cinema = get_name_cinema(url)
+    list_cinemas = create_buttons_cinemas(dict_cinema)
+    reply_keyboard = list_cinemas
+    update.message.reply_text("Выбираем кинотеатр",
+        reply_markup = ReplyKeyboardMarkup(reply_keyboard,resize_keyboard=True))
+    return("select_film")
+    

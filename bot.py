@@ -23,7 +23,8 @@ def main():
         entry_points = [RegexHandler("^(выбрать город)$", k_select_city,
             pass_user_data=True)],
         states = {
-            "select_city":[MessageHandler(Filters.text, k_select_cinema, pass_user_data= True )]
+            "select_city":[MessageHandler(Filters.text, k_select_cinema, pass_user_data= True )],
+            "select_cinema":[MessageHandler(Filters.text, k_select_cinema, pass_user_data= True )]
         },
         fallbacks = []
     )
