@@ -1,10 +1,14 @@
 import logging
 from random import choice
 from telegram import replykeyboardremove, ReplyKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, ConversationHandler
+
 
 from get import *
+from bot import location_button, main
 
-def greet_user(bot, update,user_data):
+def greet_user(bot, update, user_data):
+    user_data["user_city"] = ("https://www.kinopoisk.ru/cinemas/tc/463/")
     emo = get_user_emo(user_data)
     user_data["emo"] = emo
     text = f"""Привет, {update.message.chat.first_name} {emo}.
@@ -35,11 +39,13 @@ def change_ava(bot, update, user_data):
 
 def k_select_city(bot, update, user_data):
     reply_keyboard = [["Томск","Москва","Петербург"],
-        ["определить по месту нахождения"]]
+        [location_button]]
     update.message.reply_text(
         "Отлично! Выбираем",
         reply_markup = ReplyKeyboardMarkup(reply_keyboard, 
         one_time_keyboard = False, resize_keyboard=True))
+    if reply_keyboard == location_button:        
+        print(update.message.info)
     return("select_cinema")
 
 def k_select_cinema(bot, update, user_data):
@@ -51,6 +57,15 @@ def k_select_cinema(bot, update, user_data):
     list_cinemas = create_buttons_cinemas(dict_cinema)
     reply_keyboard = list_cinemas
     update.message.reply_text("Выбираем кинотеатр",
-        reply_markup = ReplyKeyboardMarkup(reply_keyboard,resize_keyboard=True))
+        reply_markup = ReplyKeyboardMarkup(reply_keyboard,resize_keyboard=True))   
     return("select_film")
-    
+
+
+def k_select_film(bot, update, user_data):
+    user_text = update.message.text
+    if user_text == "в начало":
+        update.message.reply_text("ок",greet_user(bot, update, user_data))
+    if user_text == "к списку городов":
+        print(bot, update, user_data)
+        return("select_city")
+   

@@ -67,7 +67,8 @@ def create_buttons_cinemas(dict_cinemas):
         three_cinema = names[:3]
         a_lists.append(three_cinema)        
         names = names[3:]
-    a_lists.append(names)           
+    a_lists.append(names)   
+    a_lists.append(["к списку городов","в начало"])
     return(a_lists)
 
 
