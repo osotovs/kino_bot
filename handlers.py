@@ -46,6 +46,7 @@ def k_select_city(bot, update, user_data):
         one_time_keyboard = False, resize_keyboard=True))
     if reply_keyboard == location_button:        
         print(update.message.info)
+        return("select_city")
     return("select_cinema")
 
 def k_select_cinema(bot, update, user_data):
@@ -64,8 +65,12 @@ def k_select_cinema(bot, update, user_data):
 def k_select_film(bot, update, user_data):
     user_text = update.message.text
     if user_text == "в начало":
-        update.message.reply_text("ок",greet_user(bot, update, user_data))
+        return("in_start")
     if user_text == "к списку городов":
         print(bot, update, user_data)
         return("select_city")
+
+
+def dontknow(bot, update, user_data):
+    reply.message.reply_text("я не знаю")
    
