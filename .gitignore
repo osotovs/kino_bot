@@ -5,5 +5,5 @@ __pycache__
 env
 *.cmd
 *.html
-citie.py
+
 *.json

@@ -2,6 +2,7 @@ import logging
 
 import settings
 from handlers import *
+from citie import *
 from telegram import KeyboardButton
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, ConversationHandler
@@ -30,8 +31,9 @@ def main():
         states = {
             "in_start":[MessageHandler(Filters.text, greet_user, pass_user_data= True )],
             "select_city":[MessageHandler(Filters.text, k_select_city, pass_user_data= True )],
-            "select_cinema":[MessageHandler(Filters.text, k_select_cinema, pass_user_data= True )],
-            "select_film":[MessageHandler(Filters.text, k_select_film, pass_user_data= True )]
+            "select_cinema":[MessageHandler(Filters.text, get_list_kinoteatr, pass_user_data= True )],
+            "select_film":[MessageHandler(Filters.text, kino_details, pass_user_data= True )],
+            "show":[MessageHandler(Filters.text, get_times, pass_user_data= True )]
         },
         fallbacks =[] #[MessageHandler(Filters.text , dontknow)]
     )

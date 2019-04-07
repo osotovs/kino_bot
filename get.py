@@ -13,8 +13,8 @@ date = td.strftime("%Y-%m-%d")
 
 
 city_list = {
-    "Томск": "https://www.kinopoisk.ru/cinemas/tc/463/",
-    "Москва": "https://www.kinopoisk.ru/cinemas/tc/1/",
+    "Томск": "https://www.afisha.ru/tomsk/cinema/cinema_list/",
+    "Москва": "https://www.afisha.ru/msk/cinema/cinema_list/",
     "Петербург": "https://www.kinopoisk.ru/cinemas/tc/2/"
 }
 
@@ -37,13 +37,17 @@ def get_keyboard():
         resize_keyboard=True)
     return(my_keyboard)
 
-
+#"
 def get_html(url):
-    # proxies = {"http":"http://195.208.172.70:8080",,
-    #     "https":"https://91.221.109.138:3128", "socks5": "socks5://138.197.157.32:1080"}
+    proxy = {"https":"https://94.242.59.135:655",
+        "https":"https://81.5.115.97:3128",
+        "https":"https://80.35.254.42:53281",
+        "https":"https://78.140.7.34:31222"
+        }        
     try:
         result = requests.get(url)
-        print(check_ip())
+        r = requests.get("https://ifconfig.me")#, proxies = proxy[2] )        
+        print(r.text)
         result.raise_for_status()        
         return result.text        
     except(requests.RequestsException, ValueError):
