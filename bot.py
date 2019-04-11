@@ -33,7 +33,7 @@ def main():
             "select_city":[MessageHandler(Filters.text, k_select_city, pass_user_data= True )],
             "select_cinema":[MessageHandler(Filters.text, get_list_kinoteatr, pass_user_data= True )],
             "select_film":[MessageHandler(Filters.text, kino_details, pass_user_data= True )],
-            "show":[MessageHandler(Filters.text, get_times, pass_user_data= True )]
+            "show":[MessageHandler(Filters.text, get_times, pass_user_data= True )]            
         },
         fallbacks =[] #[MessageHandler(Filters.text , dontknow)]
     )
