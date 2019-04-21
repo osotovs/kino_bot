@@ -23,7 +23,7 @@ def main():
    
     dp.add_handler(CommandHandler("start", greet_user,pass_user_data=True))
     dp.add_handler(RegexHandler("^(start)$", greet_user,pass_user_data=True))    
-    dp.add_handler(RegexHandler("^(ава)$", change_ava, pass_user_data = True))  
+    dp.add_handler(RegexHandler("^(поменять смайлик)$", change_ava, pass_user_data = True))  
 
     kino_dialog = ConversationHandler(
         entry_points = [RegexHandler("^(выбрать город)$", k_select_city,
@@ -38,8 +38,7 @@ def main():
         fallbacks =[] #[MessageHandler(Filters.text , dontknow)]
     )
 
-    dp.add_handler(kino_dialog)
-
+    dp.add_handler(kino_dialog)    
     dp.add_handler(MessageHandler(Filters.text, talk_to_me, pass_user_data=True))
     mybot.start_polling()
     mybot.idle()

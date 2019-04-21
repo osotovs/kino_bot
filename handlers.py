@@ -3,26 +3,23 @@ from random import choice
 from telegram import replykeyboardremove, ReplyKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, ConversationHandler
 
-
 from get import *
 from bot import location_button, main
 
 dict_cinemas = {}
-
 
 def greet_user(bot, update, user_data):
     user_data["user_city"] = ("https://www.kinopoisk.ru/cinemas/tc/463/")
     emo = get_user_emo(user_data)
     user_data["emo"] = emo
     text = f"""Привет, {update.message.chat.first_name} {emo}.
-    Я Бот, который легко поможет тебе
-    узнать какие фильмы показывают сейчас в кинотеатрах.
-    Выбери, пожалуйста город, в котором ты находишься иприступим{emo}.
-    По умолчанию это Томск{emo}
-    """
+Я Бот, который поможет тебе
+узнать какие фильмы показывают сейчас в кинотеатрах.
+Выбери, пожалуйста город, в котором ты находишься иприступим{emo}.
+"""
     logging.info   
     update.message.reply_text(text, reply_markup = get_keyboard())
-
+    
 
 def talk_to_me(bot, update,user_data):
     try:
@@ -46,7 +43,7 @@ def k_select_city(bot, update, user_data):
     reply_keyboard = [["Томск","Москва","Петербург"],
         [location_button]]
     update.message.reply_text(
-        "Отлично! Выбираем",
+        "Если Вашего города нет в списке, напишите мне его)",
         reply_markup = ReplyKeyboardMarkup(reply_keyboard, 
         resize_keyboard=True))    
     # if reply_keyboard == location_button:        

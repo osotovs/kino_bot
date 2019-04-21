@@ -32,8 +32,8 @@ def get_user_emo(user_data):
 
 
 def get_keyboard():
-    my_keyboard = ReplyKeyboardMarkup([["start", "ава"],
-        ["выбрать город"],["выбрать кинотеатр"]],
+    my_keyboard = ReplyKeyboardMarkup([["поменять смайлик"],
+        ["выбрать город"]],
         resize_keyboard=True)
     return(my_keyboard)
 
