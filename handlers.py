@@ -9,13 +9,14 @@ from bot import location_button, main
 dict_cinemas = {}
 
 def greet_user(bot, update, user_data):
-    user_data["user_city"] = ("https://www.kinopoisk.ru/cinemas/tc/463/")
+    bot.send_sticker(chat_id = update.message.chat_id, sticker = open("images/sticker_hi.webp","rb"))
+    # bot.send_photo(chat_id = update.message.chat_id, photo = open("images/foto.jpg","rb"))    
     emo = get_user_emo(user_data)
     user_data["emo"] = emo
     text = f"""Привет, {update.message.chat.first_name} {emo}.
 Я Бот, который поможет тебе
 узнать какие фильмы показывают сейчас в кинотеатрах.
-Выбери, пожалуйста город, в котором ты находишься иприступим{emo}.
+Выбери, пожалуйста город, в котором ты находишься и приступим{emo}.
 """
     logging.info   
     update.message.reply_text(text, reply_markup = get_keyboard())
@@ -43,7 +44,7 @@ def k_select_city(bot, update, user_data):
     reply_keyboard = [["Томск","Москва","Петербург"],
         [location_button]]
     update.message.reply_text(
-        "Если Вашего города нет в списке, напишите мне его)",
+        "Если Вашего города нет в списке, напишите мне его" + user_data["emo"],
         reply_markup = ReplyKeyboardMarkup(reply_keyboard, 
         resize_keyboard=True))    
     # if reply_keyboard == location_button:        
@@ -70,37 +71,41 @@ def k_select_cinema(bot, update, user_data):
             выбери из списка""")
     
 
-def k_select_film(bot, update, user_data):
-    user_text = update.message.text
-    if user_text in dict_cinemas:               
-        url = ("https://www.kinopoisk.ru" + (dict_cinemas.get(user_text)))                
-        html = get_html(url)  
-        films = get_films(html)        
-        details = str(films)        
-        soup = BeautifulSoup(details, "html.parser")        
-        update.message.reply_text(soup.text)
-        with open("afisha.html", "w", encoding = "utf-8") as film_detail:
-            film_detail.write(str(soup))
+# def k_select_film(bot, update, user_data):
+#     user_text = update.message.text
+#     if user_text in dict_cinemas:               
+#         url = ("https://www.kinopoisk.ru" + (dict_cinemas.get(user_text)))                
+#         html = get_html(url)  
+#         films = get_films(html)        
+#         details = str(films)        
+#         soup = BeautifulSoup(details, "html.parser")        
+#         update.message.reply_text(soup.text)
+#         with open("afisha.html", "w", encoding = "utf-8") as film_detail:
+#             film_detail.write(str(soup))
         
-        film = []
-        a = soup.find_all("a", class_="schedule-film__title")
-        spans = soup.find_all("div", class_ = "schedule-film__summary")			
-        d = {}	
-        for b in a:
-            film += [(b.text)]
+#         film = []
+#         a = soup.find_all("a", class_="schedule-film__title")
+#         spans = soup.find_all("div", class_ = "schedule-film__summary")			
+#         d = {}	
+#         for b in a:
+#             film += [(b.text)]
 
-        detail = []
-        for span in spans:
-            detail += [(span.text)]	
-        d.update(zip(film, detail))		
-        for r  in d.keys():			
-            name_film = (r)
-            details_film = (d[r])
-            update.message.reply_text(str(name_film), str(details_film))  
-    elif user_text == "к списку городов" :
-        return("select_city")    
-    else:
-        update.message.reply_text("чтотонетак")
+#         detail = []
+#         for span in spans:
+#             detail += [(span.text)]	
+#         d.update(zip(film, detail))		
+#         for r  in d.keys():			
+#             name_film = (r)
+#             details_film = (d[r])
+#             update.message.reply_text(str(name_film), str(details_film))  
+#     elif user_text == "к списку городов" :
+#         return("select_city")    
+#     else:
+#         update.message.reply_text("чтотонетак")
+
+def stop_conv_hand(bot, update, user_data):
+    
+    return ConversationHandler.END
 
 
 def dontknow(bot, update, user_data):

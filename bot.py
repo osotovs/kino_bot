@@ -19,9 +19,9 @@ def main():
     mybot = Updater(settings.API_KEY, request_kwargs=settings.PROXY)
     logging.info("starting") 
     dp = mybot.dispatcher  
-
    
     dp.add_handler(CommandHandler("start", greet_user,pass_user_data=True))
+    dp.add_handler(CommandHandler("cancel", stop_conv_hand,pass_user_data=True))
     dp.add_handler(RegexHandler("^(start)$", greet_user,pass_user_data=True))    
     dp.add_handler(RegexHandler("^(поменять смайлик)$", change_ava, pass_user_data = True))  
 

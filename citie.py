@@ -8,7 +8,7 @@ import re
 import time
 
 from fake_useragent import UserAgent
-from telegram import replykeyboardremove, ReplyKeyboardMarkup
+from telegram import replykeyboardremove, ReplyKeyboardMarkup, ParseMode
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, ConversationHandler
 
 import socks
@@ -41,7 +41,7 @@ def get_times(link):
 			titles = []
 			for tit in dts:				
 				t=tit.text
-				result += ("\n  " + t + "\n")				
+				result += ("\n  <b>" + t + "</b>\n")				
 				l_gs = lt.find_all("div", class_ = ("schedule-film__summary"))
 				d_fs = lf.find_all("span", class_ = ("schedule-item__formats-format"))
 				p_ts = lf.find_all("span", class_ = ("schedule-item__session-button-wrapper"))
@@ -49,7 +49,7 @@ def get_times(link):
 				dict_formats = {}
 				for lg in l_gs:					
 					lg = lg.text
-					result += (lg + "\n")					
+					result += ("<i>" + lg + "</i>\n")					
 					list_general.append(lg)
 				for df in d_fs:					
 					d= df.text
@@ -101,18 +101,20 @@ def get_kinoteatr(text):
 def get_list_kinoteatr(bot, update, user_data):	
 	user_tex = (update.message.text).capitalize()
 	
-	dict_kinoteatr = get_kinoteatr(user_tex)
-	if (dict_kinoteatr) == {}:
-		update.message.reply_text("К сожалению я пока не знаю об этом городе")
-	else:
+	if user_tex in city.CITY_LIST.keys():		
+		dict_kinoteatr = get_kinoteatr(user_tex)
 		names_kinoteatr = list(dict_kinoteatr.keys())
 		reply_keyboard = create_buttons(names_kinoteatr)
 		update.message.reply_text(
-			"Отлично! Выбираем, куда пойдем",
+			"Отлично! Выбираем, куда пойдем" + user_data["emo"],
 			reply_markup = ReplyKeyboardMarkup(reply_keyboard, 
 			resize_keyboard=True)) 	
 		return("select_film")
 
+	else:
+		update.message.reply_text("К сожалению я пока не знаю об этом городе")	
+		bot.send_sticker(chat_id = update.message.chat_id, sticker = open("images/sticker_dont_know.webp","rb"))
+	
 
 def kino_details(bot, update, user_data):
 	user_text = update.message.text	
@@ -124,9 +126,9 @@ def kino_details(bot, update, user_data):
 		print(d)	
 		get_map("https://www.kinopoisk.ru" + str(a))
 		bot.send_photo(chat_id = update.message.chat_id, photo = open("images/foto.jpg","rb"))
-		update.message.reply_text(d)		
+		update.message.reply_text(d, parse_mode = ParseMode.HTML)		
 	else:				
-		update.message.reply_text("что-то не так, давай ка сначала",
+		update.message.reply_text("что-то не так, выберите из списка или к началу",
 			reply_markup = ReplyKeyboardMarkup([["start"]],resize_keyboard=True))
 		return (ConversationHandler.END)
 
@@ -164,6 +166,15 @@ def get_map(url):
 	f.write(r.content)
 	f.close()
 
+def show_afisha():
+	r = requests.get("https://www.kinopoisk.ru/").text
+	# print(r)
+	soup = BeautifulSoup(r, "html.parser")
+	primeres = soup.find("dl", class_ =("block_soon"))
+	print(primeres.text)
+	
+	
+
 def check_ip():
 	url = 'http://icanhazip.com/'
 	out = requests.get(url).text
@@ -177,6 +188,7 @@ def g():
 
 if __name__ == "__main__":
 	# get_map()
-	g()
+	show_afisha()
+	# g()
 	
 	
