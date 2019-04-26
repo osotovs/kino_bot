@@ -4,12 +4,11 @@ from emoji import emojize
 from telegram import ReplyKeyboardMarkup, KeyboardButton
 from bs4 import BeautifulSoup
 import requests
-import datetime
+
 
 import settings
 
-td = datetime.datetime.now()
-date = td.strftime("%Y-%m-%d")
+
 
 
 # city_list = {

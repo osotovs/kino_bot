@@ -5,7 +5,8 @@ from handlers import *
 from citie import *
 from telegram import KeyboardButton
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, ConversationHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, \
+    Filters, RegexHandler, ConversationHandler, CallbackQueryHandler
 
 logging.basicConfig(format = "%(name)s - %(levelname)s - %(message)s",
                     level = logging.INFO,
@@ -24,6 +25,7 @@ def main():
     dp.add_handler(CommandHandler("cancel", stop_conv_hand,pass_user_data=True))
     dp.add_handler(RegexHandler("^(start)$", greet_user,pass_user_data=True))    
     dp.add_handler(RegexHandler("^(поменять смайлик)$", change_ava, pass_user_data = True))  
+    dp.add_handler(CallbackQueryHandler(inline_button_pressed))  
 
     kino_dialog = ConversationHandler(
         entry_points = [RegexHandler("^(выбрать город)$", k_select_city,

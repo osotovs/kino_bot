@@ -6,13 +6,22 @@ import requests
 import logging
 import re
 import time
+import datetime
 
 from fake_useragent import UserAgent
-from telegram import replykeyboardremove, ReplyKeyboardMarkup, ParseMode
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, ConversationHandler
+from telegram import replykeyboardremove, ReplyKeyboardMarkup, ParseMode,\
+	InlineKeyboardButton, InlineKeyboardMarkup 
+from telegram.ext import Updater, CommandHandler, MessageHandler, \
+	Filters, RegexHandler, ConversationHandler
 
 import socks
 import socket
+
+td = datetime.datetime.now()
+date = td.strftime("%Y-%m-%d")
+nd = td + datetime.timedelta(days = 1)
+next_day = nd.strftime("%Y-%m-%d")
+
 
 socks.set_default_proxy(socks.SOCKS5, "localhost", 9150)
 socket.socket = socks.socksocket
@@ -23,16 +32,19 @@ logging.basicConfig(format = "%(name)s - %(levelname)s - %(message)s",
 
 ua = UserAgent()
 dict_kinoteatr= {}
+url_times = ""
+day = ""
 
 def get_times(link):		
 	r = requests.get(link).text	
 	print(r)	
+	day = den(link)
 	soup = BeautifulSoup(r, "html.parser")			
 	lfs = soup.find_all("div", class_ =("schedule-item"))
 	list_films = []		
 	result = ""
 	addres = soup.find("div", class_=("cinema-header__address"))
-	result += ("\n\n" + addres.text + "\n")
+	result += ("\n\n" + addres.text + "\n<b>Расписание на </b>"+day + "\n")
 	for lf in lfs:		
 		lts = lf.find_all("div", class_ =("schedule-film__details"))		
 		for lt in lts:			
@@ -78,6 +90,12 @@ def get_times(link):
 	else:
 		return("опять забанили")
 
+def den(text):
+	result = text[-11:-1]
+	global day
+	day = result
+	return result
+
 		
 def get_kinoteatr(text):		
 	url = city.CITY_LIST.get(text)	
@@ -121,16 +139,43 @@ def kino_details(bot, update, user_data):
 	if (user_text) == "к списку городов":
 		return "select_city"
 	if user_text in dict_kinoteatr:
-		a = dict_kinoteatr.get(user_text)		
-		d = get_times("https://www.kinopoisk.ru" + str(a))
+		a = dict_kinoteatr.get(user_text)
+		global url_times
+		url_times = "https://www.kinopoisk.ru" + str(a)		
+		d = get_times(url_times + "day_view/" + date + "/")
 		print(d)	
 		get_map("https://www.kinopoisk.ru" + str(a))
 		bot.send_photo(chat_id = update.message.chat_id, photo = open("images/foto.jpg","rb"))
-		update.message.reply_text(d, parse_mode = ParseMode.HTML)		
+		update.message.reply_text(d, parse_mode = ParseMode.HTML,reply_markup = show_inline(bot,update))		
 	else:				
 		update.message.reply_text("что-то не так, выберите из списка или к началу",
 			reply_markup = ReplyKeyboardMarkup([["start"]],resize_keyboard=True))
 		return (ConversationHandler.END)
+
+def show_inline(bot, update):
+	inlinekbd = [[InlineKeyboardButton("расписание на завтра", callback_data="next_day")]]
+	inlinekbd1 = [[InlineKeyboardButton("расписание на сегодня", callback_data="today")]]
+	
+	if day == date:
+		kbd_markup = InlineKeyboardMarkup(inlinekbd)
+	elif day == next_day:
+		kbd_markup = InlineKeyboardMarkup(inlinekbd1)
+	return kbd_markup
+
+def inline_button_pressed(bot,update):
+	query = update.callback_query
+	print(query)
+	data = query.data
+	if data == "next_day":
+		link = (url_times + "day_view/" + next_day + "/")
+		print(link)
+	elif data == "today":
+		link = (url_times + "day_view/" + date + "/")
+		print(link)
+	text = get_times(link)
+	print(text)
+	bot.edit_message_text(text = text, chat_id = query.message.chat.id,
+		message_id = query.message.message_id,parse_mode = ParseMode.HTML,reply_markup = show_inline(bot,update))
 
 
 def create_buttons(list_):
