@@ -22,7 +22,6 @@ date = td.strftime("%Y-%m-%d")
 nd = td + datetime.timedelta(days = 1)
 next_day = nd.strftime("%Y-%m-%d")
 
-
 socks.set_default_proxy(socks.SOCKS5, "localhost", 9150)
 socket.socket = socks.socksocket
 
@@ -34,6 +33,7 @@ ua = UserAgent()
 dict_kinoteatr= {}
 url_times = ""
 day = ""
+dict_waiting= {}
 
 def get_times(link):		
 	r = requests.get(link).text	
@@ -76,19 +76,12 @@ def get_times(link):
 						for pric in price:
 							p = (pric.text)							
 						pr_ti =(t + "- " + p)
-						result += (pr_ti + "\n")												
-						t = for_in(times)
-						p = for_in(price)
-						t.extend(p)								
-						time_price.append(t)								
-				dict_formats[d] = time_price
-			list_general.append(dict_formats)					
-			titles.append(t)				
-		list_films.append(list_general)	
+						result += (pr_ti + "\n")		
 	if len(result) > 0:
 		return(result)
 	else:
 		return("опять забанили")
+
 
 def den(text):
 	result = text[-11:-1]
@@ -117,8 +110,7 @@ def get_kinoteatr(text):
 
 
 def get_list_kinoteatr(bot, update, user_data):	
-	user_tex = (update.message.text).capitalize()
-	
+	user_tex = (update.message.text).capitalize()	
 	if user_tex in city.CITY_LIST.keys():		
 		dict_kinoteatr = get_kinoteatr(user_tex)
 		names_kinoteatr = list(dict_kinoteatr.keys())
@@ -128,7 +120,6 @@ def get_list_kinoteatr(bot, update, user_data):
 			reply_markup = ReplyKeyboardMarkup(reply_keyboard, 
 			resize_keyboard=True)) 	
 		return("select_film")
-
 	else:
 		update.message.reply_text("К сожалению я пока не знаю об этом городе")	
 		bot.send_sticker(chat_id = update.message.chat_id, sticker = open("images/sticker_dont_know.webp","rb"))
@@ -152,28 +143,25 @@ def kino_details(bot, update, user_data):
 			reply_markup = ReplyKeyboardMarkup([["start"]],resize_keyboard=True))
 		return (ConversationHandler.END)
 
+
 def show_inline(bot, update):
 	inlinekbd = [[InlineKeyboardButton("расписание на завтра", callback_data="next_day")]]
-	inlinekbd1 = [[InlineKeyboardButton("расписание на сегодня", callback_data="today")]]
-	
+	inlinekbd1 = [[InlineKeyboardButton("расписание на сегодня", callback_data="today")]]	
 	if day == date:
 		kbd_markup = InlineKeyboardMarkup(inlinekbd)
 	elif day == next_day:
 		kbd_markup = InlineKeyboardMarkup(inlinekbd1)
 	return kbd_markup
 
+
 def inline_button_pressed(bot,update):
-	query = update.callback_query
-	print(query)
+	query = update.callback_query	
 	data = query.data
 	if data == "next_day":
-		link = (url_times + "day_view/" + next_day + "/")
-		print(link)
+		link = (url_times + "day_view/" + next_day + "/")		
 	elif data == "today":
-		link = (url_times + "day_view/" + date + "/")
-		print(link)
-	text = get_times(link)
-	print(text)
+		link = (url_times + "day_view/" + date + "/")		
+	text = get_times(link)	
 	bot.edit_message_text(text = text, chat_id = query.message.chat.id,
 		message_id = query.message.message_id,parse_mode = ParseMode.HTML,reply_markup = show_inline(bot,update))
 
@@ -196,13 +184,9 @@ def for_in(lists):
 	return(d)	
 
 
-def get_map(url):
-	proxy = {"https":"https://94.242.59.135:655",
-      
-        }        
-	# url = "https://www.kinopoisk.ru/afisha/city/450/cinema/263968/"
+def get_map(url):	
 	time.sleep(1)
-	resp = requests.get(url).text# proxies = proxy).text
+	resp = requests.get(url).text
 	soup = BeautifulSoup(resp, "html.parser")	
 	s = soup.find("div", class_=("cinema-header__map"))		
 	img = s.find("img", class_ = ("image-partial-component","image-partial-component_loaded"))["src"]	
@@ -211,13 +195,64 @@ def get_map(url):
 	f.write(r.content)
 	f.close()
 
-def show_afisha():
-	r = requests.get("https://www.kinopoisk.ru/").text
-	# print(r)
+
+def show_ten(bot,update,user_data):
+	r = requests.get("https://www.kinopoisk.ru/comingsoon/sex/all/").text	
 	soup = BeautifulSoup(r, "html.parser")
-	primeres = soup.find("dl", class_ =("block_soon"))
-	print(primeres.text)
+	premieres = soup.find("div", class_ ="coming_films")
+	films = premieres.find_all("div", class_="item")
+	count = 0
+	result = []
+	rusul = ""
+	c = 0	
+	for film in films:			
+		info = film.find_all("div", class_="info")
+		for inf in info:			
+			title = inf.find_all("div", class_="name")
+			for tit in title:					
+				name_t = tit.find_all("a", href = re.compile("^/film/"))					
+				for nt in name_t:												
+					result.append(nt.text)
+					a_link =(nt["href"])
+					global dict_waiting
+					name_title = nt.text.replace("\xa0", " ")
+					dict_waiting[name_title] = a_link						
+	reply_keyboard = create_buttons(result[0:10])	
+	res = (result)
+	print(dict_waiting)	
+	a=str(res[0:11])
+	update.message.reply_text("здесь будет описание..)", reply_markup = ReplyKeyboardMarkup(reply_keyboard,
+		resize_keyboard=True))
+	return ("waiting")
 	
+
+def show_waiting(bot, update,user_data):
+	print(dict_waiting)
+	user_text = update.message.text
+	print(user_text)
+	a = dict_waiting.get(user_text)
+	url = "https://www.kinopoisk.ru" + str(a)
+	time.sleep(1)	
+	r = requests.get(url).text
+	soup = BeautifulSoup(r,"html.parser")	
+	discr = soup.find("div",class_=("brand_words","film-synopsys"), itemprop ="description")
+	print(discr.text)
+	get_poster(url)
+	bot.send_photo(chat_id = update.message.chat_id, photo = open("images/poster.jpg","rb"))
+	update.message.reply_text(discr.text)
+
+
+def get_poster(url):
+	r = requests.get(url).text
+	soup = BeautifulSoup(r, "html.parser")
+	img = soup.find("a", class_ = "popupBigImage")
+	poster = img.find("img")["src"]
+	f = open("images/poster.jpg", "wb")
+	result = requests.get(poster)
+	f.write(result.content)
+	f.close()
+	
+
 	
 
 def check_ip():
@@ -226,6 +261,7 @@ def check_ip():
 	# out = (out.replace('\n',''))
 	print (out)
 
+
 def g():
 	for i in range(10):
 		check_ip()
@@ -233,7 +269,7 @@ def g():
 
 if __name__ == "__main__":
 	# get_map()
-	show_afisha()
+	# show_ten()
 	# g()
-	
+	get_poster("https://www.kinopoisk.ru/film/1047883/")
 	

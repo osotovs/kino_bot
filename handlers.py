@@ -5,12 +5,12 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Regex
 
 from get import *
 from bot import location_button, main
+from citie import *
 
 dict_cinemas = {}
 
 def greet_user(bot, update, user_data):
-    bot.send_sticker(chat_id = update.message.chat_id, sticker = open("images/sticker_hi.webp","rb"))
-    # bot.send_photo(chat_id = update.message.chat_id, photo = open("images/foto.jpg","rb"))    
+    bot.send_sticker(chat_id = update.message.chat_id, sticker = open("images/sticker_hi.webp","rb"))       
     emo = get_user_emo(user_data)
     user_data["emo"] = emo
     text = f"""Привет, {update.message.chat.first_name} {emo}.
@@ -24,13 +24,16 @@ def greet_user(bot, update, user_data):
 
 def talk_to_me(bot, update,user_data):
     try:
-        get_user_emo(user_data)
-        text = update.message.text        
-        update.message.reply_text("{}, ты написал {} {}".format(update.message.chat.first_name, 
-            text, user_data["emo"]), reply_markup = get_keyboard())
-        logging.info(text)
+        show_waiting(bot, update, user_data)
     except:
-        update.message.reply_text("что то пошло не так")
+        try:
+            get_user_emo(user_data)
+            text = update.message.text        
+            update.message.reply_text("{}, ты написал {} {}".format(update.message.chat.first_name, 
+                text, user_data["emo"]), reply_markup = get_keyboard())
+            logging.info(text)
+        except:
+            update.message.reply_text("что то пошло не так")
 
 
 def change_ava(bot, update, user_data):
@@ -46,9 +49,7 @@ def k_select_city(bot, update, user_data):
     update.message.reply_text(
         "Если Вашего города нет в списке, напишите мне его" + user_data["emo"],
         reply_markup = ReplyKeyboardMarkup(reply_keyboard, 
-        resize_keyboard=True))    
-    # if reply_keyboard == location_button:        
-    #     print(logging.info(text)    
+        resize_keyboard=True))       
     return ("select_cinema") 
 
 
@@ -69,42 +70,9 @@ def k_select_cinema(bot, update, user_data):
     else:
         update.message.reply_text("""у меня пока нет данных по этому городу
             выбери из списка""")
-    
 
-# def k_select_film(bot, update, user_data):
-#     user_text = update.message.text
-#     if user_text in dict_cinemas:               
-#         url = ("https://www.kinopoisk.ru" + (dict_cinemas.get(user_text)))                
-#         html = get_html(url)  
-#         films = get_films(html)        
-#         details = str(films)        
-#         soup = BeautifulSoup(details, "html.parser")        
-#         update.message.reply_text(soup.text)
-#         with open("afisha.html", "w", encoding = "utf-8") as film_detail:
-#             film_detail.write(str(soup))
-        
-#         film = []
-#         a = soup.find_all("a", class_="schedule-film__title")
-#         spans = soup.find_all("div", class_ = "schedule-film__summary")			
-#         d = {}	
-#         for b in a:
-#             film += [(b.text)]
 
-#         detail = []
-#         for span in spans:
-#             detail += [(span.text)]	
-#         d.update(zip(film, detail))		
-#         for r  in d.keys():			
-#             name_film = (r)
-#             details_film = (d[r])
-#             update.message.reply_text(str(name_film), str(details_film))  
-#     elif user_text == "к списку городов" :
-#         return("select_city")    
-#     else:
-#         update.message.reply_text("чтотонетак")
-
-def stop_conv_hand(bot, update, user_data):
-    
+def stop_conv_hand(bot, update, user_data):    
     return ConversationHandler.END
 
 

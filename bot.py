@@ -23,7 +23,10 @@ def main():
    
     dp.add_handler(CommandHandler("start", greet_user,pass_user_data=True))
     dp.add_handler(CommandHandler("cancel", stop_conv_hand,pass_user_data=True))
-    dp.add_handler(RegexHandler("^(start)$", greet_user,pass_user_data=True))    
+    dp.add_handler(RegexHandler("^(start)$", greet_user,pass_user_data=True)) 
+    dp.add_handler(RegexHandler("^(Топ ожидаемых фильмов)$", show_ten, pass_user_data = True))  
+    dp.add_handler(RegexHandler("^(waiting)$", show_waiting, pass_user_data = True))  
+
     dp.add_handler(RegexHandler("^(поменять смайлик)$", change_ava, pass_user_data = True))  
     dp.add_handler(CallbackQueryHandler(inline_button_pressed))  
 
